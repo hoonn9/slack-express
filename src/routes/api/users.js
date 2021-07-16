@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-const { isNotLoggedIn } = require('../middleware');
+const { isNotLoggedIn, isLoggedIn } = require('../middleware');
 
 const User = require('../../db/models/user');
 
@@ -12,28 +12,45 @@ router.get('/users', (req, res, next) => {
 });
 
 router.post('/users/login', isNotLoggedIn, (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
-    if (err) {
-      console.error(err);
-      return next(err);
-    }
-    if (info) {
-      return res.statusCode(401).send(info.reason);
-    }
-    return req.login(user, async (loginErr) => {
-      if (loginErr) {
-        console.error(loginErr);
-        return next(loginErr);
+  console.log(req.flash());
+  passport.authenticate(
+    'local',
+    {
+      successRedirect: '/',
+      failureRedirect: '/login',
+      failureFlash: true,
+      successFlash: true,
+    },
+    (err, user, info) => {
+      if (err) {
+        console.error(err);
+        return next(err);
       }
+      if (info) {
+        return res.status(401).send(info.reason);
+      }
+      return req.login(user, async (loginErr) => {
+        if (loginErr) {
+          console.error(loginErr);
+          return next(loginErr);
+        }
 
-      const loggedUser = await User.findOne({
-        where: { id: user.id },
-        attributes: ['id', 'nickname', 'email'],
+        const loggedUser = await User.findOne({
+          where: { id: user.id },
+          attributes: ['id', 'nickname', 'email'],
+        });
+
+        return res.status(200).json(loggedUser);
       });
+    },
+  )(req, res, next);
+});
 
-      return res.status(200).json(loggedUser);
-    });
-  })(req, res, next);
+router.post('/users/logout', isLoggedIn, (req, res) => {
+  req.logout();
+  req.session.destroy((err) => {
+    res.redirect('/');
+  });
 });
 
 router.post('/users', isNotLoggedIn, async (req, res, next) => {
