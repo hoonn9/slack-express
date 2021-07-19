@@ -7,6 +7,7 @@ module.exports = {
     database: 'slack',
     host: '127.0.0.1',
     dialect: 'mysql',
+    logging: false,
   },
   test: {
     username: 'root',
@@ -14,6 +15,7 @@ module.exports = {
     database: 'slack',
     host: '127.0.0.1',
     dialect: 'mysql',
+    logging: false,
   },
   production: {
     username: 'root',
@@ -21,5 +23,6 @@ module.exports = {
     database: 'slack',
     host: '127.0.0.1',
     dialect: 'mysql',
+    logging: false,
   },
 };

@@ -11,6 +11,18 @@ router.get('/users', (req, res, next) => {
   return res.json(req.user || false);
 });
 
+// Workspace history
+router.get('/users/history', (req, res, next) => {
+  if (req.cookies['w-sid']) {
+    if (req.user) {
+      const w = JSON.parse(req.cookies['w-sid']);
+      return res.json(w);
+    }
+    res.clearCookie();
+  }
+  return res.json(false);
+});
+
 router.post('/users/login', isNotLoggedIn, (req, res, next) => {
   console.log(req.flash());
   passport.authenticate(

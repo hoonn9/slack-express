@@ -7,6 +7,7 @@ const FileStore = require('session-file-store')(session);
 const flash = require('connect-flash');
 const users = require('./routes/api/users');
 const workspaces = require('./routes/api/workspaces');
+const channels = require('./routes/api/channels');
 
 require('./db')();
 
@@ -26,6 +27,7 @@ require('./passport')(app);
 
 app.use('/api', users);
 app.use('/api', workspaces);
+app.use('/api', channels);
 
 app.set('PORT', process.env.PORT || 3095);
 

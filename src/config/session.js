@@ -2,6 +2,8 @@ module.exports = () => {
   const prod = process.env.NODE_ENV === 'production';
 
   const sessionOptions = {
+    name: 'connect.sid',
+    path: '/',
     resave: false,
     saveUninitialized: false,
     secret: process.env.COOKIE_SECRET,
