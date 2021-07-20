@@ -8,7 +8,7 @@ class User extends Model {
         email: {
           type: DataTypes.STRING(30),
           allowNull: false,
-          unique: true,
+          unique: 'email',
         },
         nickname: {
           type: DataTypes.STRING(30),
@@ -41,6 +41,7 @@ class User extends Model {
     db.User.belongsToMany(db.Channel, {
       through: 'ChannelMembers',
     });
+    db.User.hasMany(db.ChannelChat);
   }
 }
 

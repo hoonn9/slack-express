@@ -226,7 +226,7 @@ router.post('/workspaces/:workspace/channels/:channel/members', isLoggedIn, asyn
     }
 
     await channel.addMembers(user);
-    return status(200).send('ok');
+    return res.status(200).send('ok');
   } catch (error) {
     console.dir(error);
     next(error);

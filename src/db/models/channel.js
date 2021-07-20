@@ -26,7 +26,7 @@ class Channel extends Model {
   }
   static associate(db) {
     db.Channel.belongsTo(db.Workspace);
-    // db.Channel.hasMany(db.ChannelChat, { as: "Chats" });
+    db.Channel.hasMany(db.ChannelChat, { as: 'Chats' });
     db.Channel.belongsToMany(db.User, {
       through: 'ChannelMembers',
       as: 'Members',

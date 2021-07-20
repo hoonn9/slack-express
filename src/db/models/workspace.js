@@ -7,12 +7,12 @@ class Workspace extends Model {
         name: {
           type: DataTypes.STRING(30),
           allowNull: false,
-          unique: true,
+          unique: 'name',
         },
         url: {
           type: DataTypes.STRING(30),
           allowNull: false,
-          unique: true,
+          unique: 'url',
         },
       },
       {

@@ -84,6 +84,10 @@ router.get('/workspaces/:workspace/members', isLoggedIn, async (req, res, next) 
       },
     });
 
+    if (!workspace) {
+      return res.status(404).send('존재하지 않는 워크스페이스 입니다.');
+    }
+
     const members = await workspace.getMembers({
       attributes: ['id', 'nickname', 'email'],
     });
@@ -144,5 +148,7 @@ router.post('/workspaces/:workspace/members', isLoggedIn, isWorkspaceOwner, asyn
     next(error);
   }
 });
+
+// Kick member
 
 module.exports = router;
