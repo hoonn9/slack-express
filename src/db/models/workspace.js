@@ -32,6 +32,7 @@ class Workspace extends Model {
       as: 'Members',
     });
     db.Workspace.hasMany(db.Channel);
+    db.Workspace.hasMany(db.DM);
   }
 }
 

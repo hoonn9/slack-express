@@ -5,11 +5,11 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const flash = require('connect-flash');
-const path = require('path');
 const users = require('./routes/api/users');
 const workspaces = require('./routes/api/workspaces');
 const channels = require('./routes/api/channels');
 const channelChats = require('./routes/api/channelChats');
+const dm = require('./routes/api/dm');
 
 const webSocket = require('./socket');
 const { uploadRouter } = require('./multer');
@@ -34,6 +34,7 @@ app.use('/api', users);
 app.use('/api', workspaces);
 app.use('/api', channels);
 app.use('/api', channelChats);
+app.use('/api', dm);
 app.use('/uploads', uploadRouter);
 app.set('PORT', process.env.PORT || 3095);
 
@@ -42,3 +43,4 @@ const server = app.listen(app.get('PORT'), () => {
 });
 
 webSocket(server, app);
+require('./cleaner');

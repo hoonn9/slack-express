@@ -4,6 +4,7 @@ const passport = require('passport');
 const { isNotLoggedIn, isLoggedIn } = require('../middleware');
 
 const User = require('../../db/models/user');
+const { Workspace } = require('../../db/models');
 
 const router = express.Router();
 
@@ -23,6 +24,7 @@ router.get('/users/history', (req, res, next) => {
   return res.json(false);
 });
 
+// Login User
 router.post('/users/login', isNotLoggedIn, (req, res, next) => {
   console.log(req.flash());
   passport.authenticate(
@@ -58,6 +60,7 @@ router.post('/users/login', isNotLoggedIn, (req, res, next) => {
   )(req, res, next);
 });
 
+// Logout User
 router.post('/users/logout', isLoggedIn, (req, res) => {
   req.logout();
   req.session.destroy((err) => {
@@ -65,6 +68,7 @@ router.post('/users/logout', isLoggedIn, (req, res) => {
   });
 });
 
+// Join User
 router.post('/users', isNotLoggedIn, async (req, res, next) => {
   try {
     const existUser = await User.findOne({
@@ -89,6 +93,39 @@ router.post('/users', isNotLoggedIn, async (req, res, next) => {
   } catch (error) {
     console.error(error);
     // status code 500
+    next(error);
+  }
+});
+
+// Get User
+router.get('/workspaces/:workspace/users/:id', isLoggedIn, async (req, res, next) => {
+  try {
+    const workspace = await Workspace.findOne({
+      where: { url: req.params.workspace },
+    });
+    if (!workspace) {
+      return res.status(404).send('존재하지 않는 워크스페이스입니다.');
+    }
+    const user = await User.findOne({
+      where: { id: req.params.id },
+      include: [
+        {
+          model: Workspace,
+          as: 'Workspaces',
+          through: {
+            where: {
+              WorkspaceId: workspace.id,
+            },
+          },
+          required: true,
+        },
+      ],
+    });
+    if (!user) {
+      return res.status(404).send('존재하지 않는 사용자입니다.');
+    }
+    return res.json(user);
+  } catch (error) {
     next(error);
   }
 });
