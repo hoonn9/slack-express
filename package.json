@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/app",
-    "start": "cross-env NODE_ENV=production pm2 start src/app.js",
+    "start:dev": "cross-env NODE_ENV=development pm2 start src/app.js",
+    "start": "pm2-runtime start ecosystem.config.js --env production",
     "kill": "pm2 kill",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
