@@ -25,6 +25,9 @@ module.exports = {
     host: process.env.DATABASE_HOST,
     dialect: process.env.DATABASE_TYPE,
     use_env_variable: 'DATABASE_URL',
+    dialectOptions: {
+      ssl: true,
+    },
     logging: false,
   },
 };
