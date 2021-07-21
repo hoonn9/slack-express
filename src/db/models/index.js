@@ -6,6 +6,8 @@ const workspaceMember = require('./workspaceMember');
 const channel = require('./channel');
 const channelChat = require('./channelChat');
 const dm = require('./dm');
+const onlineMap = require('./onlineMap');
+const onlineMember = require('./onlineMember');
 
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
@@ -19,6 +21,8 @@ db.WorkspaceMember = workspaceMember;
 db.Channel = channel;
 db.ChannelChat = channelChat;
 db.DM = dm;
+db.OnlineMap = onlineMap;
+db.OnlineMember = onlineMember;
 
 console.log(db);
 

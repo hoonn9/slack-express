@@ -8,7 +8,7 @@ module.exports = {
     database: process.env.DATABASE_NAME,
     host: process.env.DATABASE_HOST,
     dialect: process.env.DATABASE_TYPE,
-    logging: true,
+    logging: false,
   },
   test: {
     username: process.env.DATABASE_USERNAME,

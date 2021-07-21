@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(hpp());
 } else {
-  app.use(morgan('dev'));
+  // app.use(morgan('dev'));
   // app.use(
   //   cors({
   //     origin: true,

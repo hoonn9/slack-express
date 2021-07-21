@@ -1,37 +1,97 @@
 const SocketIo = require('socket.io');
+const { OnlineMap, OnlineMember } = require('./db/models');
 
-const onlineMap = {};
+// const onlineMap = {};
 module.exports = (server, app) => {
   const io = SocketIo(server, {
     path: '/socket.io',
   });
   app.set('io', io);
-  app.set('onlineMap', onlineMap);
-
-  io.of(/^\/ws-.+$/).on('connect', (client) => {
+  io.of(/^\/ws-.+$/).on('connect', async (client) => {
     const namespace = client.nsp;
 
+    let onlineMap = await OnlineMap.findOne({
+      where: {
+        namespace: namespace.name,
+      },
+    });
     // Map에 없으면 Workspace 초기화
-    if (!onlineMap[namespace.name]) {
-      onlineMap[namespace.name] = {};
+    if (!onlineMap) {
+      onlineMap = await OnlineMap.create({
+        namespace: namespace.name,
+      });
     }
 
     client.emit(`hello ${namespace.name} workspace`);
-
-    client.on('login', (listener) => {
+    client.on('login', async (listener) => {
       const { id, channels } = listener;
-      onlineMap[namespace.name][client.id] = id;
-      namespace.emit('onlineList', Object.values(onlineMap[namespace.name]));
-      console.log(onlineMap);
+
+      const onlineMap = await OnlineMap.findOne({
+        where: {
+          namespace: namespace.name,
+        },
+        include: [
+          {
+            model: OnlineMember,
+            as: 'Members',
+            attributes: ['id', 'clientId', 'UserId'],
+          },
+        ],
+      });
+
+      console.log('id', id);
+      const user = onlineMap.Members.find((member) => {
+        console.log(member);
+        return member.UserId === id;
+      });
+      if (!user) {
+        const member = await OnlineMember.create({
+          clientId: client.id,
+          UserId: id,
+          OnlineMapId: onlineMap.id,
+        });
+        onlineMap.Members.push(member);
+      }
+
+      namespace.emit(
+        'onlineList',
+        onlineMap.Members.map((member) => member.UserId),
+      );
       channels.forEach((ch) => {
         console.log(`${namespace.name}-${ch}`);
         client.join(`${namespace.name}-${ch}`);
       });
     });
 
-    client.on('disconnect', () => {
-      delete onlineMap[namespace.name][client.id];
-      namespace.emit('onlineList', Object.values(onlineMap[namespace.name]));
+    client.on('disconnect', async () => {
+      console.log('disconnect');
+      const onlineMap = await OnlineMap.findOne({
+        where: {
+          namespace: namespace.name,
+        },
+        include: [
+          {
+            model: OnlineMember,
+            as: 'Members',
+          },
+        ],
+      });
+      if (onlineMap) {
+        const onlineMembers = [];
+
+        await Promise.all(
+          onlineMap.Members.map(async (member) => {
+            if (member.clientId === client.id) {
+              await member.destroy();
+            }
+            onlineMembers.push(member);
+          }),
+        );
+        namespace.emit(
+          'onlineList',
+          onlineMembers.map((member) => member.UserId),
+        );
+      }
     });
   });
 };
