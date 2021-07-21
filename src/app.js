@@ -8,6 +8,9 @@ const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const flash = require('connect-flash');
 const path = require('path');
+const morgan = require('morgan');
+const hpp = require('hpp');
+const helmet = require('helmet');
 const users = require('./routes/api/users');
 const workspaces = require('./routes/api/workspaces');
 const channels = require('./routes/api/channels');
@@ -21,7 +24,23 @@ require('./db')();
 
 const app = express();
 
+if (process.env.NODE_ENV === 'production') {
+  app.enable('trust proxy');
+  app.use(morgan('combined'));
+  app.use(helmet({ contentSecurityPolicy: false }));
+  app.use(hpp());
+} else {
+  app.use(morgan('dev'));
+  // app.use(
+  //   cors({
+  //     origin: true,
+  //     credentials: true,
+  //   })
+  // );
+}
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.use(
