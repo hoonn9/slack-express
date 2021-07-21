@@ -26,8 +26,10 @@ module.exports = {
     use_env_variable: 'DATABASE_URL',
     dialect: process.env.DATABASE_TYPE,
     dialectOptions: {
-      ssl: true,
-      rejectUnauthorized: false,
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
     },
     logging: false,
   },

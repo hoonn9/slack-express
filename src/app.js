@@ -48,6 +48,7 @@ app.get('*', (req, res, next) => {
 app.set('PORT', process.env.PORT || 3095);
 
 const server = app.listen(app.get('PORT'), () => {
+  console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
   console.log(`listening on port ${app.get('PORT')}`);
 });
 
