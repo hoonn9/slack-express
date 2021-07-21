@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const flash = require('connect-flash');
+const path = require('path');
 const users = require('./routes/api/users');
 const workspaces = require('./routes/api/workspaces');
 const channels = require('./routes/api/channels');
@@ -36,6 +37,12 @@ app.use('/api', channels);
 app.use('/api', channelChats);
 app.use('/api', dm);
 app.use('/uploads', uploadRouter);
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('*', (req, res, next) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.set('PORT', process.env.PORT || 3095);
 
 const server = app.listen(app.get('PORT'), () => {
@@ -43,4 +50,4 @@ const server = app.listen(app.get('PORT'), () => {
 });
 
 webSocket(server, app);
-require('./cleaner');
+// require('./cleaner');
