@@ -19,14 +19,15 @@ module.exports = {
     logging: true,
   },
   production: {
+    database: process.env.DATABASE_NAME,
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE_NAME,
     host: process.env.DATABASE_HOST,
-    dialect: process.env.DATABASE_TYPE,
     use_env_variable: 'DATABASE_URL',
+    dialect: process.env.DATABASE_TYPE,
     dialectOptions: {
       ssl: true,
+      rejectUnauthorized: false,
     },
     logging: false,
   },
