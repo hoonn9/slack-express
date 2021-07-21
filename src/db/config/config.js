@@ -1,28 +1,29 @@
-require('dotenv').config();
-
+require('dotenv').config({
+  path: process.env.NODE_ENV === 'production' ? '.production.env' : '.development.env',
+});
 module.exports = {
   development: {
-    username: 'root',
-    password: process.env.MYSQL_PASSWORD,
-    database: 'slack',
-    host: '127.0.0.1',
-    dialect: 'mysql',
-    logging: false,
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME,
+    host: process.env.DATABASE_HOST,
+    dialect: process.env.DATABASE_TYPE,
+    logging: true,
   },
   test: {
-    username: 'root',
-    password: process.env.MYSQL_PASSWORD,
-    database: 'slack',
-    host: '127.0.0.1',
-    dialect: 'mysql',
-    logging: false,
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME,
+    host: process.env.DATABASE_HOST,
+    dialect: process.env.DATABASE_TYPE,
+    logging: true,
   },
   production: {
-    username: 'root',
-    password: process.env.MYSQL_PASSWORD,
-    database: 'slack',
-    host: '127.0.0.1',
-    dialect: 'mysql',
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME,
+    host: process.env.DATABASE_HOST,
+    dialect: process.env.DATABASE_TYPE,
     logging: false,
   },
 };
