@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const fs = require('fs');
 const path = require('path');
+const { OnlineMember } = require('./db/models');
 
 // Schedule tasks to be run on the server.
 cron.schedule('*/15 * * * * *', function () {
@@ -23,3 +24,10 @@ cron.schedule('*/15 * * * * *', function () {
 
   console.log('running a task every minute');
 });
+
+const cleanOnlineMembers = async () => {
+  const members = await OnlineMember.findAll();
+  await Promise.all(members.map(async (member) => member.destroy()));
+};
+
+cleanOnlineMembers();

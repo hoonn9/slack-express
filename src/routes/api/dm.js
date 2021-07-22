@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Workspace, User, DM } = require('../../db/models');
+const { Workspace, User, DM, OnlineMap, OnlineMember } = require('../../db/models');
 const { upload } = require('../../multer');
 const { isLoggedIn } = require('../middleware');
 
@@ -32,13 +32,23 @@ router.post('/workspaces/:workspace/dms/:id/chats', isLoggedIn, async (req, res,
       ],
     });
     const io = req.app.get('io');
-    const onlineMap = req.app.get('onlineMap');
-    const workspaceOnlineMap = onlineMap[`/ws-${workspace.url}`];
-    const receiverSocketId = Object.keys(workspaceOnlineMap).find(
-      (socketId) => workspaceOnlineMap[socketId] === Number(ReceiverId),
-    );
 
-    io.of(`/ws-${workspace.url}`).to(receiverSocketId).emit('dm', dmWithSender);
+    const onlineMap = await OnlineMap.findOne({
+      where: {
+        namespace: `/ws-${workspace.url}`,
+      },
+      include: [
+        {
+          model: OnlineMember,
+          as: 'Members',
+          attributes: ['id', 'clientId', 'UserId'],
+        },
+      ],
+    });
+
+    const receiverClientId = onlineMap.Members.find((member) => member.UserId === Number(ReceiverId));
+
+    io.of(`/ws-${workspace.url}`).to(receiverClientId).emit('dm', dmWithSender);
     res.send('ok');
   } catch (error) {
     next(error);
@@ -120,12 +130,22 @@ router.post('/workspaces/:workspace/dms/:id/images', upload.array('image'), isLo
           ],
         });
         const io = req.app.get('io');
-        const onlineMap = req.app.get('onlineMap');
-        const workspaceOnlineMap = onlineMap[`/ws-${workspace.url}`];
-        const receiverSocketId = Object.keys(workspaceOnlineMap).find(
-          (socketId) => workspaceOnlineMap[socketId] === Number(ReceiverId),
-        );
-        io.of(`/ws-${workspace.url}`).to(receiverSocketId).emit('dm', dmWithSender);
+
+        const onlineMap = await OnlineMap.findOne({
+          where: {
+            namespace: `/ws-${workspace.url}`,
+          },
+          include: [
+            {
+              model: OnlineMember,
+              as: 'Members',
+              attributes: ['id', 'clientId', 'UserId'],
+            },
+          ],
+        });
+
+        const receiverClientId = onlineMap.Members.find((member) => member.UserId === Number(ReceiverId));
+        io.of(`/ws-${workspace.url}`).to(receiverClientId).emit('dm', dmWithSender);
       }),
     );
     return res.send('ok');

@@ -1,7 +1,6 @@
 const SocketIo = require('socket.io');
 const { OnlineMap, OnlineMember } = require('./db/models');
 
-// const onlineMap = {};
 module.exports = (server, app) => {
   const io = SocketIo(server, {
     path: '/socket.io',
@@ -39,9 +38,7 @@ module.exports = (server, app) => {
         ],
       });
 
-      console.log('id', id);
       const user = onlineMap.Members.find((member) => {
-        console.log(member);
         return member.UserId === id;
       });
       if (!user) {
@@ -51,6 +48,9 @@ module.exports = (server, app) => {
           OnlineMapId: onlineMap.id,
         });
         onlineMap.Members.push(member);
+      } else {
+        user.clientId = client.id;
+        await user.save();
       }
 
       namespace.emit(
@@ -83,6 +83,7 @@ module.exports = (server, app) => {
           onlineMap.Members.map(async (member) => {
             if (member.clientId === client.id) {
               await member.destroy();
+              return;
             }
             onlineMembers.push(member);
           }),
