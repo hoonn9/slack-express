@@ -25,6 +25,7 @@ module.exports = (server, app) => {
     client.on('login', async (listener) => {
       const { id, channels } = listener;
 
+      console.log('login');
       const onlineMap = await OnlineMap.findOne({
         where: {
           namespace: namespace.name,
@@ -52,6 +53,8 @@ module.exports = (server, app) => {
         user.clientId = client.id;
         await user.save();
       }
+
+      onlineMap.Members.forEach((mem) => console.log(mem.UserId));
 
       namespace.emit(
         'onlineList',

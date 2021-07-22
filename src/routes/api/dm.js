@@ -46,9 +46,8 @@ router.post('/workspaces/:workspace/dms/:id/chats', isLoggedIn, async (req, res,
       ],
     });
 
-    const receiverClientId = onlineMap.Members.find((member) => member.UserId === Number(ReceiverId));
-
-    io.of(`/ws-${workspace.url}`).to(receiverClientId).emit('dm', dmWithSender);
+    const receiverMember = onlineMap.Members.find((member) => member.UserId === Number(ReceiverId));
+    io.of(`/ws-${workspace.url}`).to(receiverMember.clientId).emit('dm', dmWithSender);
     res.send('ok');
   } catch (error) {
     next(error);
@@ -144,8 +143,8 @@ router.post('/workspaces/:workspace/dms/:id/images', upload.array('image'), isLo
           ],
         });
 
-        const receiverClientId = onlineMap.Members.find((member) => member.UserId === Number(ReceiverId));
-        io.of(`/ws-${workspace.url}`).to(receiverClientId).emit('dm', dmWithSender);
+        const receiverMember = onlineMap.Members.find((member) => member.UserId === Number(ReceiverId));
+        io.of(`/ws-${workspace.url}`).to(receiverMember.clientId).emit('dm', dmWithSender);
       }),
     );
     return res.send('ok');
